@@ -1,23 +1,20 @@
 from socket import *
+import random
 import time
 
 # Create UDP socket
-clientSocket = socket(AF_INET, SOCK_DGRAM)
-clientSocket.settimeout(1)  # 1 second timeout
+serverSocket = socket(AF_INET, SOCK_DGRAM)
+serverSocket.bind(('', 12000))
 
-serverName = 'localhost'
-serverPort = 12000
+print("UDP Ping Server with delay is ready to receive")
 
-for i in range(10):
-    message = f"Ping {i+1} {time.time()}"
-    start = time.time()
-    try:
-        clientSocket.sendto(message.encode(), (serverName, serverPort))
-        modifiedMessage, serverAddress = clientSocket.recvfrom(1024)
-        end = time.time()
-        rtt = (end - start) * 1000  # Convert to ms
-        print(f"Reply from {serverName}: {modifiedMessage.decode()} RTT = {rtt:.2f} ms")
-    except timeout:
-        print("Request timed out")
+while True:
+    # Receive message from client
+    message, address = serverSocket.recvfrom(1024)
 
-clientSocket.close()
+    # Simulate 10–20 ms delay
+    delay = random.uniform(0.01, 0.02)
+    time.sleep(delay)
+
+    # Send the message back
+    serverSocket.sendto(message, address)
